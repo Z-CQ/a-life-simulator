@@ -1,7 +1,11 @@
+#include "src/headers/Zone.h"
+
 #include <stdio.h>
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello world!\n";
+    Zone zone{};
+
+    zone.Populate(11, 5, 3);
 }
