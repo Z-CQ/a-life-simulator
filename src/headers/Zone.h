@@ -48,6 +48,12 @@ public:
 
     ~Zone() {
         // Destroy all agents
-        for(AlifeAgent* ag : AllAgents) { delete ag; }
+        for(AlifeAgent* ag : AllAgents)
+        {
+            if(ag->GetAgentTeam())
+                delete ag->GetAgentTeam();
+                
+            delete ag;
+        }
     }
 };

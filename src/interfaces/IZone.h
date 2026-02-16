@@ -10,7 +10,7 @@ public:
     virtual ~IZone() = default;
 
     virtual double GenerateInRange(double min, double max) = 0;
-    virtual std::vector<AlifeAgent*> GetAllAgents() const;
+    virtual std::vector<AlifeAgent*> GetAllAgents() const = 0;
 
 
 };

@@ -6,6 +6,50 @@
 #include "../util/Structures.h"
 
 #include <string>
+#include <algorithm>
+
+struct Inventory {
+    int Ammo;
+    int Food;
+    int Water;
+    int Bandages;
+
+    void Zero() {
+        *this = {};
+    }
+};
+
+struct Stats {
+    // Is this agent alive?
+    bool Alive = true;
+
+    // The amount of health this agent has left. <= 0 and killable will kill the agent.
+    int Health = 100;
+
+    // 0-1; chance to move when not following leader.
+    double MovementSpeed = 0.5;
+
+    // 0-1; higher strength: higher odds of winning a close-quarters fight.
+    double Strength = 0.5;
+
+    // 0-1; higher skill: higher odds of winning a gunfight.
+    double Skill = 0.5;
+
+    // 0-1; how aware the agent is when an ally is attacked.
+    double Awareness = 0.5;
+
+    // 0-1; how likley the agent is to see an enemy.
+    double Sight = 0.5;
+
+    // 0-1; how happy this agent is. Lower is higher chance to run and less performance.
+    double Morale = 0.5;
+
+    // How much health does this agent regenerate per tick?
+    int Regen = 0;
+
+    // How much health should this agent lose per tick?
+    int BleedAmount = 0;
+};
 
 class AlifeAgent {
 
@@ -22,38 +66,30 @@ protected:
     Factions::Faction agentFaction;
     Team* team;
 
-    // The amount of health this agent has left. <= 0 and killable will kill the agent.
-    int health;
-
     // Is the agent killable?
     bool killable;
 
     // Can this agent move?
     bool moveable;
 
-    // Acts as a deviation for chance to move.
-    int moveSpeed;
+    // The agent's stats.
+    Stats stats;
 
-    // Higher strength: higher odds of winning a close-quarters fight.
-    int strength;
+    // The loot the Agent has.
+    Inventory inventory;
 
-    // Higher skill: higher odds of winning a gunfight.
-    int skill;
-
-    // 0-1; how aware the agent is when an ally is attacked.
-    float awareness;
-
-    // 0-1; how likley the agent is to see an enemy.
-    float sight;
+    // The max HP this agent can have.
+    int maxHP;
 
     // Targeted agent
     AlifeAgent* target;
     
 public:
 
-    AlifeAgent();
+    AlifeAgent(IZone* owningZone, Stats initialStats);
 
     virtual void Update();
+    virtual void OnAttacked([[maybe_unused]] AlifeAgent* Attacker) {}
 
     Vector2& GetLocation() { return position; }
 
@@ -68,8 +104,14 @@ public:
     Team* GetAgentTeam() const { return team; }
     void SetAgentTeam(Team* t) { team = t; }
 
-    int GetHealth() const { return health; }
-    void SetHealth(int h) { health = h; }
+    bool IsAlive() const { return stats.Alive; }
+    void SetAlive(bool a) { stats.Alive = a; }
+
+    int GetHealth() const { return stats.Health; }
+    void SetHealth(int h) { stats.Health = h; }
+
+    int GetRegeneration() const { return stats.Regen; }
+    void SetRegeneration(int r) { stats.Regen = r; }
 
     bool IsKillable() const { return killable; }
     void SetKillable(bool k) { killable = k; }
@@ -78,36 +120,54 @@ public:
     void SetMoveable(bool m) { moveable = m; }
 
     // Acts as a deviation for chance to move.
-    int GetMoveSpeed() const { return moveSpeed; }
-    void SetMoveSpeed(int s) { moveSpeed = s; }
+    int GetMoveSpeed() const { return stats.MovementSpeed; }
 
     // Higher strength: higher odds of winning a close-quarters fight.
-    int GetStrength() const { return strength; }
-    void SetStrength(int s) { strength = s; }
+    int GetStrength() const { return stats.Strength; }
 
     // Higher skill: higher odds of winning a gunfight.
-    int GetSkill() const { return skill; }
-    void SetSkill(int s) { skill = s; }
+    int GetSkill() const { return stats.Skill; }
 
     // 0-1; how aware the agent is when an ally is attacked.
-    float GetAwareness() const { return awareness; }
-    void SetAwareness(float a) { awareness = a; }
+    float GetAwareness() const { return stats.Awareness; }
 
     // 0-1; how likley the agent is to see an enemy.
-    float GetSight() const { return sight; }
-    void SetSight(float s) { sight = s; }
+    float GetSight() const { return stats.Sight; }
 
+    // 0-1; how happy this agent is. Lower is higher chance to run and less performance.
+    bool GetMorale() const { return stats.Morale; }
+    void AdjustMorale(double m) { stats.Morale = std::clamp(stats.Morale + m, 0.0, 1.0); }
+
+    // How much health should this agent lose per tick?
+    int GetBleeding() const { return stats.BleedAmount; }
+    void SetBleeding(int b) { stats.BleedAmount = b; };
+    void StopBleeding() { stats.BleedAmount = 0; }
+
+    // The loot the agent has.
+    Inventory& GetInventory() { return inventory; };
+
+    // Set all values in the inventory to zero.
+    void ZeroInventory() { inventory.Zero(); };
+
+    // Who is this agent attacking?
     AlifeAgent* GetTarget() const { return target; }
     void SetTarget(AlifeAgent* t) { target = t; }
 
-    void SetZone(IZone* newZone) { zone = newZone; }
-
-    // Remove this agent from its team.
-    void DetachFromTeam();
+    /**
+     * Remove this agent from its team.
+     * 
+     * @return `true` if the agent detached or not.
+     */
+    bool DetachFromTeam();
 
     // Make this agent the leader of its team.
     void PromoteToLeader();
-
     
+    void Hurt(int Damage, AlifeAgent* Attacker);
+    void Heal(int Amount);
 
+    void Kill();
+
+
+    virtual ~AlifeAgent() = default;
 };

@@ -1,10 +1,14 @@
 #include "Factions.h"
 
+#include <iostream>
+
 namespace Factions {
 
     Attitude relations[FactionCount][FactionCount];
 
     void InitFactions() {
+        std::cout << "Initializing factions...\n";
+        
         for (int i = 0; i < FactionCount; ++i)
             for (int j = 0; j < FactionCount; ++j)
                 relations[i][j] = Attitude::Neutral;

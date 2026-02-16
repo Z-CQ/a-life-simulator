@@ -25,4 +25,6 @@ public:
 
     void SetTeamLeader(AlifeAgent* Agent);
 
+    bool IsEmpty() const { return AllAgents.empty(); }
+
 };

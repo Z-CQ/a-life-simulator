@@ -15,22 +15,37 @@ bool Team::ContainsAgent(AlifeAgent* Agent) const
 
 bool Team::AddAgent(AlifeAgent* Agent)
 {
-    if(!ContainsAgent(Agent))
+    if(!ContainsAgent(Agent)) {
         AllAgents.push_back(Agent);
+        return true;
+    }
+
+    return false;
 }
 
 bool Team::RemoveAgent(const AlifeAgent* Agent)
 {
     auto it = std::find(AllAgents.begin(), AllAgents.end(), Agent);
-
-    if(it == AllAgents.end())
+    if (it == AllAgents.end())
         return false;
 
     *it = AllAgents.back();
     AllAgents.pop_back();
 
+    if (IsEmpty())
+    {
+        SetTeamLeader(nullptr);
+        return true;
+    }
+
+    if(Leader == Agent)
+    {
+        Leader = AllAgents.front();
+    }
+
     return true;
 }
+
 
 void Team::SetTeamLeader(AlifeAgent* Agent)
 {
