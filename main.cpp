@@ -8,4 +8,8 @@ int main()
     Zone zone{};
 
     zone.Populate(11, 5, 3);
+
+    zone.AddEntry("Hello world!");
+    zone.AddEntry("Ready?");
+    zone.Update();
 }

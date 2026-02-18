@@ -13,3 +13,22 @@ bool Stalker::UseBandage()
 
     return true;
 }
+
+void Stalker::OnAttacked(AlifeAgent* Attacker)
+{
+    if(!GetTarget())
+    {
+        SetTarget(Attacker);
+        OnAllyAttacked(Attacker);
+    }
+}
+
+void Stalker::OnAllyAttacked(AlifeAgent* Attacker)
+{
+    if(!GetTarget())
+    {
+        bool ChanceToTarget = zone->GenerateInRange(0, 1) <= GetAwareness();
+        if(ChanceToTarget)
+            SetTarget(Attacker);
+    }
+}

@@ -89,7 +89,14 @@ public:
     AlifeAgent(IZone* owningZone, Stats initialStats);
 
     virtual void Update();
-    virtual void OnAttacked([[maybe_unused]] AlifeAgent* Attacker) {}
+    virtual void OnAttacked([[maybe_unused]] AlifeAgent* Attacker) {
+        if(GetAgentTeam()) {
+            for(AlifeAgent* ag : GetAgentTeam()->GetAllAgents())
+                if(ag != this)
+                    ag->OnAllyAttacked(Attacker);
+        }
+    }
+    virtual void OnAllyAttacked([[maybe_unused]] AlifeAgent* Attacker) {}
 
     Vector2& GetLocation() { return position; }
 

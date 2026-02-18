@@ -1,5 +1,12 @@
 #include "headers/Zone.h"
 
+#include <iostream>
+
+Zone::Zone() : eng(std::random_device{}())
+{
+    renderer = new ZoneRenderer();
+}
+
 double Zone::GenerateInRange(double min, double max)
 {
     std::uniform_real_distribution<double> dist(min, max);
@@ -31,7 +38,17 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
 }
 
+void Zone::AddEntry(std::string log)
+{
+    ActivityLog.push_back("Tick " + std::to_string(ActivityLog.size()) + ": " + log);
+}
+
 void Zone::Update()
 {
+    for(AlifeAgent* ag : AllAgents)
+        if(ag)
+            ag->Update();
 
+    renderer->SetActivityLog(ActivityLog);
+    renderer->Display();
 }

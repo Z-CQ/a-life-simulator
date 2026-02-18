@@ -29,6 +29,7 @@ public:
 
     virtual void Update() override;
     virtual void OnAttacked(AlifeAgent* Attacker) override;
+    virtual void OnAllyAttacked(AlifeAgent* Attacker) override;
 
     /**
      * Use a bandage to heal.

@@ -10,7 +10,10 @@ OBJ = $(SRC:.cpp=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET)
+	$(CXX) $(OBJ) -o $(TARGET) \
+	-lftxui-component \
+	-lftxui-dom \
+	-lftxui-screen
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

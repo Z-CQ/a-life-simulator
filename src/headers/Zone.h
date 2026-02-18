@@ -2,6 +2,7 @@
 
 #include "../interfaces/IZone.h"
 #include "AlifeAgent.h"
+#include "ZoneRenderer.h"
 
 #include <memory>
 #include <random>
@@ -10,27 +11,20 @@ class Zone : IZone {
 
 protected:
     std::mt19937 eng;
+    ZoneRenderer* renderer;
 
-    // All agents in the Zone.
     std::vector<AlifeAgent*> AllAgents;
 
+    std::vector<std::string> ActivityLog;
+
 public:
-    // Seed the engine with a random device on instantiation.
-    Zone() : eng(std::random_device{}()) {}
-
-    /**
-     * Generates a number between [min, max).
-     * 
-     * @param min The lowest number to generate, inclusive.
-     * @param max The largest number to generate, exclusive.
-     * @return The number generated [min, max).
-     */
+    // Seed the engine with a random device and create a renderer on instantiation.
+    Zone();
+    
     double GenerateInRange(double min, double max) override;
-
-    // @return All living agents registered in the Zone.
     std::vector<AlifeAgent*> GetAllAgents() const override { return AllAgents; }
 
-
+    void AddEntry(std::string log) override;
 
     /**
      * Creates a random amount of Stalkers and Mutants, using deviation [-Deviation, Deviation) to add or subtract to both agent counts.
@@ -42,7 +36,7 @@ public:
     void Populate(int Stalkers, int Mutants, int Deviation);
 
     /**
-     * Called every tick of the game. Updates each agent. Naturally, the call frequency determines the speed of the simulation.
+     * Called every tick of the game. Updates each agent and display. Naturally, the call frequency determines the speed of the simulation.
      */
     void Update();
 
@@ -50,10 +44,12 @@ public:
         // Destroy all agents
         for(AlifeAgent* ag : AllAgents)
         {
-            if(ag->GetAgentTeam())
+            if(ag && ag->GetAgentTeam())
                 delete ag->GetAgentTeam();
                 
             delete ag;
         }
+
+        delete renderer;
     }
 };
