@@ -2,6 +2,7 @@
 
 #include "../interfaces/IZone.h"
 #include "AlifeAgent.h"
+#include "Stalker.h"
 #include "ZoneRenderer.h"
 
 #include <memory>

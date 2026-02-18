@@ -14,6 +14,10 @@ bool Stalker::UseBandage()
     return true;
 }
 
+void Stalker::Update()
+{
+}
+
 void Stalker::OnAttacked(AlifeAgent* Attacker)
 {
     if(!GetTarget())

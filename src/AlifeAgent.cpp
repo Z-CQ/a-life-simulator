@@ -2,15 +2,11 @@
 
 unsigned int AlifeAgent::nextID = 0;
 
-AlifeAgent::AlifeAgent(IZone* owningZone, Stats initialStats)
+AlifeAgent::AlifeAgent(IZone* owningZone, Stats initialStats) : zone(owningZone), stats(initialStats)
 {
     agentID = nextID;
     nextID++;
-
-    stats = initialStats;
     maxHP = stats.Health;
-
-    zone = owningZone;
 }
 
 void AlifeAgent::Update()

@@ -40,7 +40,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
 void Zone::AddEntry(std::string log)
 {
-    ActivityLog.push_back("Tick " + std::to_string(ActivityLog.size()) + ": " + log);
+    ActivityLog.push_back(log);
 }
 
 void Zone::Update()
@@ -50,5 +50,7 @@ void Zone::Update()
             ag->Update();
 
     renderer->SetActivityLog(ActivityLog);
+    renderer->SetAgents(AllAgents);
+
     renderer->Display();
 }

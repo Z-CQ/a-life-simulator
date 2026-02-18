@@ -88,7 +88,7 @@ public:
 
     AlifeAgent(IZone* owningZone, Stats initialStats);
 
-    virtual void Update();
+    virtual void Update() = 0;
     virtual void OnAttacked([[maybe_unused]] AlifeAgent* Attacker) {
         if(GetAgentTeam()) {
             for(AlifeAgent* ag : GetAgentTeam()->GetAllAgents())

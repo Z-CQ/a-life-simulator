@@ -19,13 +19,15 @@ enum MovementState {
     FLEEING, // Running?
 };
 
-class Stalker : AlifeAgent {
+class Stalker : public AlifeAgent {
 
 private:
     Intent currentIntent;
     MovementState currentMovementState;
 
 public:
+
+    Stalker(IZone* owningZone, Stats initialStats) : AlifeAgent(owningZone, initialStats) {}
 
     virtual void Update() override;
     virtual void OnAttacked(AlifeAgent* Attacker) override;

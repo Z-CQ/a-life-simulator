@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ftxui/screen/color.hpp>
+
 namespace Factions {
     enum class Faction {
         Mutant,
@@ -31,4 +33,7 @@ namespace Factions {
      * @return The attitude between both factions
      */
     Attitude GetRelation(Faction a, Faction b);
+
+    ftxui::Color ResolveFactionColor(Faction fac);
+
 }
