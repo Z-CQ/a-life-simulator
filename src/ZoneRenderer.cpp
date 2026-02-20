@@ -9,21 +9,26 @@ void ZoneRenderer::ClearDisplay()
 
 Element ZoneRenderer::BuildWorldPane(int w, int h)
 {
-  Canvas c(w * 2, h * 4);
+    Canvas c(w * 2, h * 4);
 
-  for(AlifeAgent* ag : agents)
-  {
-    Color col = Factions::ResolveFactionColor(ag->GetAgentFaction());
-    if(ag->IsAlive())
+    for(AlifeAgent* ag : agents)
     {
-        c.DrawText(ag->GetLocation().x * 2, ag->GetLocation().y * 4, "O", col);
+        Color col = Factions::ResolveFactionColor(ag->GetAgentFaction());
+        if(ag->IsAlive())
+        {
+            c.DrawText(ag->GetLocation().x * 2, ag->GetLocation().y * 4, "O", col);
+        }
+        else {
+            c.DrawText(ag->GetLocation().x * 2, ag->GetLocation().y * 4, "X", col); // Corpse
+        }
     }
-    else {
-        c.DrawText(ag->GetLocation().x * 2, ag->GetLocation().y * 4, "X", col); // Corpse
-    }
-  }
 
-  return canvas(std::move(c));
+    for(EnvironmentEntity* e : env)
+    {
+        c.DrawText(e->GetPosition().x * 2, e->GetPosition().y * 4, std::string(1, e->GetResembledBy()), e->GetColor());
+    }
+
+    return canvas(std::move(c));
 }
 
 Element ZoneRenderer::BuildLogPane(int maxLines)

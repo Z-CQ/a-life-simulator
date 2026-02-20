@@ -27,6 +27,8 @@ public:
     // @return All living agents registered in the Zone.
     virtual std::vector<AlifeAgent*> GetAllAgents() const = 0;
 
+    virtual AlifeAgent* GetAgentByID(int AgentID) const = 0;
+
     /**
      * Add an entry to the activity log and increase numLogs.
      * 

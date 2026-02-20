@@ -1,6 +1,6 @@
 #include "headers/AlifeAgent.h"
 
-unsigned int AlifeAgent::nextID = 0;
+unsigned int AlifeAgent::nextID = 2; // Starting at two so that 1 can be reserved for campfires, and 0 reserved for walls.
 
 AlifeAgent::AlifeAgent(IZone* owningZone, Stats initialStats) : zone(owningZone), stats(initialStats)
 {

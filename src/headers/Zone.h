@@ -3,6 +3,8 @@
 #include "../interfaces/IZone.h"
 #include "AlifeAgent.h"
 #include "Stalker.h"
+#include "Mutant.h"
+#include "EnvironmentEntity.h"
 #include "ZoneRenderer.h"
 
 #include <memory>
@@ -16,6 +18,8 @@ protected:
 
     std::vector<AlifeAgent*> AllAgents;
     std::vector<Team*> AllTeams;
+
+    std::vector<EnvironmentEntity*> AllEnvironmentEntites;
 
     std::vector<std::string> ActivityLog;
 
@@ -34,6 +38,8 @@ public:
     double GenerateInRange(double min, double max) override;
     int GenerateInRange(int min, int max) override;
     std::vector<AlifeAgent*> GetAllAgents() const override { return AllAgents; }
+
+    AlifeAgent* GetAgentByID(int AgentID) const { return AllAgents[AgentID - 2]; /* Agent IDs start at 2. */ }
 
     void AddEntry(std::string log) override;
 
@@ -108,6 +114,10 @@ public:
         // Destroy all teams
         for(Team* t : AllTeams)
             delete t;
+
+        // Destroy all environment entities (campfires, walls, stuff like that)
+        for(EnvironmentEntity* e : AllEnvironmentEntites)
+            delete e;
 
         delete renderer;
     }

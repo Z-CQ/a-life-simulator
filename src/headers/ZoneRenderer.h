@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AlifeAgent.h"
+#include "EnvironmentEntity.h"
 
 #include <vector>
 #include <string>
@@ -16,6 +17,7 @@ class ZoneRenderer {
 private:
     std::vector<std::string> log;
     std::vector<AlifeAgent*> agents;
+    std::vector<EnvironmentEntity*> env;
 
     /**
      * Create a canvas that draws the zone: agents, walls, campfires, etc.
@@ -39,8 +41,9 @@ private:
 public:
     void ClearDisplay();
 
-    void SetActivityLog(std::vector<std::string> l) { log = l; }
+    void SetActivityLog(std::vector<std::string> &l) { log = l; }
     void SetAgents(std::vector<AlifeAgent*> &ag) { agents = ag; }
+    void SetEnvironmentEntities(std::vector<EnvironmentEntity*> &ev) { env = ev; }
 
     void Display();
 
