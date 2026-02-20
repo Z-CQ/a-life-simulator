@@ -49,6 +49,12 @@ struct Stats {
 
     // How much health should this agent lose per tick?
     int BleedAmount = 0;
+
+    // 0-1; how thirsty is this agent?
+    double Thirst = 0.0;
+
+    // 0-1; how hungry is this agent?
+    double Hunger = 0.0;
 };
 
 class AlifeAgent {

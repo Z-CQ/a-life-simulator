@@ -7,6 +7,8 @@ namespace Factions {
         Mutant,
         Loner,
         Bandit,
+        Duty,
+        Freedom,
         Count
     };
 

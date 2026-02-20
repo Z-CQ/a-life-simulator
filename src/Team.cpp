@@ -4,19 +4,19 @@
 
 std::vector<AlifeAgent*> Team::GetAllAgents() const
 {
-    return AllAgents;
+    return Members;
 }
 
 bool Team::ContainsAgent(AlifeAgent* Agent) const
 {
-    auto it = std::find(AllAgents.begin(), AllAgents.end(), Agent);
-    return it != AllAgents.end();
+    auto it = std::find(Members.begin(), Members.end(), Agent);
+    return it != Members.end();
 }
 
 bool Team::AddAgent(AlifeAgent* Agent)
 {
     if(!ContainsAgent(Agent)) {
-        AllAgents.push_back(Agent);
+        Members.push_back(Agent);
         return true;
     }
 
@@ -25,12 +25,12 @@ bool Team::AddAgent(AlifeAgent* Agent)
 
 bool Team::RemoveAgent(const AlifeAgent* Agent)
 {
-    auto it = std::find(AllAgents.begin(), AllAgents.end(), Agent);
-    if (it == AllAgents.end())
+    auto it = std::find(Members.begin(), Members.end(), Agent);
+    if (it == Members.end())
         return false;
 
-    *it = AllAgents.back();
-    AllAgents.pop_back();
+    *it = Members.back();
+    Members.pop_back();
 
     if (IsEmpty())
     {
@@ -40,7 +40,7 @@ bool Team::RemoveAgent(const AlifeAgent* Agent)
 
     if(Leader == Agent)
     {
-        Leader = AllAgents.front();
+        Leader = Members.front();
     }
 
     return true;

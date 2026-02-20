@@ -15,7 +15,6 @@ class ZoneRenderer {
 
 private:
     std::vector<std::string> log;
-    
     std::vector<AlifeAgent*> agents;
 
     /**

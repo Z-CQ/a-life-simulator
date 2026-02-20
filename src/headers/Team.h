@@ -1,16 +1,24 @@
 #pragma once
 
 #include <vector>
+#include "../util/Structures.h"
 
 class AlifeAgent;
 
 class Team {
 
 protected:
-    std::vector<AlifeAgent*> AllAgents;
+    std::vector<AlifeAgent*> Members;
     AlifeAgent* Leader;
 
+    Vector2 origin;
+    double angle;
+    double spread;
+
 public:
+    Team() : Leader(nullptr), origin{0, 0}, angle(0.0), spread(1.0) {}
+
+
     // @return All agents part of the team.
     std::vector<AlifeAgent*> GetAllAgents() const;
 
@@ -25,6 +33,17 @@ public:
 
     void SetTeamLeader(AlifeAgent* Agent);
 
-    bool IsEmpty() const { return AllAgents.empty(); }
+    bool IsEmpty() const { return Members.empty(); }
+
+    AlifeAgent* GetTeamLeader() const { return Leader; }
+
+    Vector2 GetOrigin() const { return origin; }
+    void SetOrigin(Vector2 o) { origin = o; }
+
+    double GetAngle() const { return angle; }
+    void SetAngle(double a) { angle = a; }
+
+    double GetSpread() const { return spread; }
+    void SetSpread(double s) { spread = s; }
 
 };

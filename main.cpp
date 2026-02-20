@@ -9,7 +9,7 @@ int main()
 {
     Zone zone{};
 
-    zone.Populate(11, 5, 3);
+    zone.Populate(38, 5, 3);
 
     // Simualation loop
     while (true) {

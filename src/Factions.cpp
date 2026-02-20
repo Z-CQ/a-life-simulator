@@ -26,12 +26,18 @@ namespace Factions {
     ftxui::Color ResolveFactionColor(Faction fac) {
         switch(fac)
         {
+            case Faction::Freedom:
+                return ftxui::Color::Green;
+            case Faction::Duty:
+                return ftxui::Color::Red;
             case Faction::Bandit:
                 return ftxui::Color::GrayDark;
             case Faction::Loner:
                 return ftxui::Color::Yellow1;
             case Faction::Mutant:
                 return ftxui::Color::RosyBrown;
+            default:
+                return ftxui::Color::GrayLight;
         }
     }
 
