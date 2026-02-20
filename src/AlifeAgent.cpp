@@ -56,10 +56,6 @@ bool AlifeAgent::DetachFromTeam()
         return false;
     
     GetAgentTeam()->RemoveAgent(this);
-
-    if(GetAgentTeam()->IsEmpty())
-        delete GetAgentTeam();
-
     SetAgentTeam(nullptr);
 
     return true;

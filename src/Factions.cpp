@@ -11,12 +11,25 @@ namespace Factions {
             for (int j = 0; j < FactionCount; ++j)
                 relations[i][j] = Attitude::Neutral;
 
-        // Tell the mutants to hate everyone.
-        for(int i = 1; i < FactionCount; ++i)
+        // Tell the mutants to hate everyone and vice versa.
+        for(int i = 1; i < FactionCount; ++i) {
             relations[0][i] = Attitude::Hostile;
+            relations[i][0] = Attitude::Hostile;
+        }
 
+        /* Loner Relations */
         relations[(int)Faction::Loner][(int)Faction::Bandit] = Attitude::Hostile;
+
+        /* Bandit Relations */
         relations[(int)Faction::Bandit][(int)Faction::Loner] = Attitude::Hostile;
+        relations[(int)Faction::Bandit][(int)Faction::Duty] = Attitude::Hostile;
+
+        /* Freedom Relations */
+        relations[(int)Faction::Freedom][(int)Faction::Duty] = Attitude::Hostile;
+
+        /* Duty Relations */
+        relations[(int)Faction::Duty][(int)Faction::Freedom] = Attitude::Hostile;
+        relations[(int)Faction::Duty][(int)Faction::Bandit] = Attitude::Hostile;
     }
 
     Attitude GetRelation(Faction a, Faction b) {
