@@ -55,6 +55,34 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
     // How many campfires should be on the map?
     int numCampfires = GenerateInRange(2, 5);
 
+    // How many "buildings" should be on the map?
+    int numBuildings = GenerateInRange(7, 12);
+
+    for(int i = 0; i < numBuildings; i++)
+    {
+        std::cout << "Generating a new building." << std::endl;
+
+        int width = GenerateInRange(5, 8);
+        int height = GenerateInRange(2, 6);
+
+        Vector2 spawnPos{
+            GenerateInRange(0, GetSimWidth() - width),
+            GenerateInRange(0, GetSimHeight() - height)
+        };
+
+        if(IsPositionOccupied(spawnPos)) {
+            if(!FindFreeSpace(spawnPos, 5))
+                continue;
+        }
+
+        EnvironmentEntity* building = new EnvironmentEntity(spawnPos, ftxui::Color::GrayDark, '#', 0, width, height);
+        for(int w = 0; w < width; w++)
+            for(int h = 0; h < height; h++)
+                SetMapValue(spawnPos.x + w, spawnPos.y + h, 0);
+
+        AllEnvironmentEntites.push_back(building);
+    }
+
     // Generate the amount of stalker teams needed
     for(int i = 0; i < numStalkerTeams; i++)
     {
@@ -69,8 +97,13 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
         // Keep some margin from the edges
         int margin = 4;
-        team->SetOrigin(Vector2{GenerateInRange(margin, GetSimWidth() - margin),
-            GenerateInRange(margin, GetSimHeight() - margin)});
+        Vector2 teamOrigin = Vector2{GenerateInRange(margin, GetSimWidth() - margin),
+            GenerateInRange(margin, GetSimHeight() - margin)};
+
+        if(IsPositionOccupied(teamOrigin))
+            FindFreeSpace(teamOrigin, 8);
+
+        team->SetOrigin(teamOrigin);
 
         // Spread to control how far apart they are; smaller is tighter
         team->SetSpread(std::max(1.0, std::min(60.0, (double)stalkersPerTeam * 2.0)));
@@ -156,8 +189,13 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
         // Keep some margin from the edges
         int margin = 4;
-        team->SetOrigin(Vector2{GenerateInRange(margin, GetSimWidth() - margin),
-            GenerateInRange(margin, GetSimHeight() - margin)});
+        Vector2 teamOrigin = Vector2{GenerateInRange(margin, GetSimWidth() - margin),
+            GenerateInRange(margin, GetSimHeight() - margin)};
+
+        if(IsPositionOccupied(teamOrigin))
+            FindFreeSpace(teamOrigin, 8);
+
+        team->SetOrigin(teamOrigin);
 
         // Spread to control how far apart they are; smaller is tighter
         team->SetSpread(std::max(1.0, std::min(60.0, (double)mutantsPerTeam * 2.0)));
@@ -241,8 +279,8 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
         if(IsPositionOccupied(spawnPos))
             FindFreeSpace(spawnPos, 5);
 
-        EnvironmentEntity* campfire = new EnvironmentEntity(spawnPos, ftxui::Color::Orange1, 'A', 0);
-        SetMapValue(spawnPos, 0);
+        EnvironmentEntity* campfire = new EnvironmentEntity(spawnPos, ftxui::Color::Orange1, 'A', 1);
+        SetMapValue(spawnPos, 1);
 
         AllEnvironmentEntites.push_back(campfire);
     }
