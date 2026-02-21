@@ -7,6 +7,7 @@
 
 #include <string>
 #include <algorithm>
+#include <cmath>
 
 struct Inventory {
     int Ammo;
@@ -26,7 +27,7 @@ struct Stats {
     // The amount of health this agent has left. <= 0 and killable will kill the agent.
     int Health = 100;
 
-    // 0-1; chance to move when not following leader.
+    // 0-1; chance to move
     double MovementSpeed = 0.5;
 
     // 0-1; higher strength: higher odds of winning a close-quarters fight.
@@ -81,13 +82,17 @@ private:
 
 protected:
     IZone* zone;
+    
+    Intent currentIntent = PATROL;
+    MovementState currentMovementState = MOVING;
 
     Vector2 position;
+    AgentDirection ownDirection;
 
     unsigned int agentID;
     std::string agentName;
     Factions::Faction agentFaction;
-    Team* team;
+    Team* team = nullptr;
 
     // Is the agent killable?
     bool killable;
@@ -105,7 +110,11 @@ protected:
     int maxHP;
 
     // Targeted agent
-    AlifeAgent* target;
+    AlifeAgent* target = nullptr;
+
+
+    double overflowX;
+    double overflowY;
     
 public:
 
@@ -150,22 +159,22 @@ public:
     void SetMoveable(bool m) { moveable = m; }
 
     // Acts as a deviation for chance to move.
-    int GetMoveSpeed() const { return stats.MovementSpeed; }
+    double GetMoveSpeed() const { return stats.MovementSpeed; }
 
     // Higher strength: higher odds of winning a close-quarters fight.
-    int GetStrength() const { return stats.Strength; }
+    double GetStrength() const { return stats.Strength; }
 
     // Higher skill: higher odds of winning a gunfight.
-    int GetSkill() const { return stats.Skill; }
+    double GetSkill() const { return stats.Skill; }
 
     // 0-1; how aware the agent is when an ally is attacked.
-    float GetAwareness() const { return stats.Awareness; }
+    double GetAwareness() const { return stats.Awareness; }
 
     // 0-1; how likley the agent is to see an enemy.
-    float GetSight() const { return stats.Sight; }
+    double GetSight() const { return stats.Sight; }
 
     // 0-1; how happy this agent is. Lower is higher chance to run and less performance.
-    bool GetMorale() const { return stats.Morale; }
+    double GetMorale() const { return stats.Morale; }
     void AdjustMorale(double m) { stats.Morale = std::clamp(stats.Morale + m, 0.0, 1.0); }
 
     // How much health should this agent lose per tick?
@@ -183,6 +192,9 @@ public:
     AlifeAgent* GetTarget() const { return target; }
     void SetTarget(AlifeAgent* t) { target = t; }
 
+    AgentDirection GetDirection() const { return ownDirection; }
+    void SetDirection(AgentDirection dir) { ownDirection = dir; }
+
     /**
      * Remove this agent from its team.
      * 
@@ -197,6 +209,22 @@ public:
     void Heal(int Amount);
 
     void Kill();
+
+    /**
+     * Tell the agent to walk in its current direction.
+     */
+    void Move();
+
+    /**
+     * Move this agent by `x` and by `y` coordinates.
+     * First, the agent shifts on the x axis. Then, on the y axis.
+     * If the agent cannot move on an axis (an obstacle is in the way), it will skip that axis.
+     * This does not test for obstacles from and to, only the target coordinates.
+     * 
+     * @param x How many x steps to move by.
+     * @param y How many y steps to move by.
+     */
+    void MoveBy(int x, int y);
 
 
     virtual ~AlifeAgent() = default;

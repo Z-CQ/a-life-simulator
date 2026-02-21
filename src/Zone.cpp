@@ -29,7 +29,7 @@ int Zone::GenerateInRange(int min, int max)
     return dist(eng);
 }
 
-void Zone::Populate(int Stalkers, int Mutants, int Deviation)
+void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation)
 {
     Factions::InitFactions();
 
@@ -53,10 +53,10 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
     int numMutantTeams = (finalMutantCount + mutantsPerTeam - 1) / mutantsPerTeam;
 
     // How many campfires should be on the map?
-    int numCampfires = GenerateInRange(2, 5);
+    int numCampfires = Campfires + GenerateInRange(-Deviation, Deviation);
 
     // How many "buildings" should be on the map?
-    int numBuildings = GenerateInRange(7, 12);
+    int numBuildings = Buildings + GenerateInRange(-Deviation, Deviation);
 
     for(int i = 0; i < numBuildings; i++)
     {
@@ -117,7 +117,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
             // Create initial stats for the stalker
             Stats stats;
-            stats.MovementSpeed += GenerateInRange(-0.25, 0.25);
+            stats.MovementSpeed += GenerateInRange(0.3, 0.5);
             stats.Strength += GenerateInRange(-0.25, 0.25);
             stats.Skill += GenerateInRange(-0.25, 0.25);
             stats.Awareness += GenerateInRange(-0.1, 0.1);
@@ -130,6 +130,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
             Stalker* stalker = new Stalker(this, stats);
 
             team->AddAgent(stalker);
+            stalker->SetAgentTeam(team);
             if(!team->GetTeamLeader())
             {
                 team->SetTeamLeader(stalker);
@@ -209,7 +210,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
 
             // Create initial stats for the mutant
             Stats stats;
-            stats.MovementSpeed += GenerateInRange(-0.1, 0.3);
+            stats.MovementSpeed += GenerateInRange(0.4, 0.5);
             stats.Strength += GenerateInRange(0.0, 0.3);
             stats.Skill = 0;
             stats.Awareness += GenerateInRange(-0.25, 0.1);
@@ -222,6 +223,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Deviation)
             Mutant* mutant = new Mutant(this, stats);
 
             team->AddAgent(mutant);
+            mutant->SetAgentTeam(team);
             if(!team->GetTeamLeader())
             {
                 team->SetTeamLeader(mutant);

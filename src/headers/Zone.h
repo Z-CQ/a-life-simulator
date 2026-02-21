@@ -28,24 +28,24 @@ protected:
 
     std::vector<int> Map;
 
-    inline int GetMapTile(int x, int y) const { return y * GetSimWidth() + x; }
-    inline int GetMapTile(Vector2& pos) const { return pos.y * GetSimWidth() + pos.x; }
-
-public:
+    
+    public:
     // Seed the engine with a random device and create a renderer on instantiation.
     Zone();
     
     double GenerateInRange(double min, double max) override;
     int GenerateInRange(int min, int max) override;
     std::vector<AlifeAgent*> GetAllAgents() const override { return AllAgents; }
-
-    AlifeAgent* GetAgentByID(int AgentID) const { return AllAgents[AgentID - 2]; /* Agent IDs start at 2. */ }
-
+    
+    AlifeAgent* GetAgentByID(int AgentID) const override { return AllAgents[AgentID - 2]; /* Agent IDs start at 2. */ }
+    
     void AddEntry(std::string log) override;
-
+    
     int GetSimWidth() const override { return simWidth; }
     int GetSimHeight() const override { return simHeight; }
-
+    
+    inline int GetMapTile(int x, int y) const override { return y * GetSimWidth() + x; }
+    inline int GetMapTile(Vector2& pos) const override { return pos.y * GetSimWidth() + pos.x; }
     std::vector<int> GetMap() const override { return Map; }
 
     /**
@@ -53,9 +53,11 @@ public:
      * 
      * @param Stalkers The amount of stalkers to generate.
      * @param Mutants The amount of mutants to generate.
-     * @param Deviation The range to subtract/add to both counts.
+     * @param Campfires The amount of campfires to generate.
+     * @param Buildings The amount of buildings to generate.
+     * @param Deviation The range to subtract/add to all counts.
      */
-    void Populate(int Stalkers, int Mutants, int Deviation);
+    void Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation);
 
     /**
      * Called every tick of the game. Updates each agent and display. Naturally, the call frequency determines the speed of the simulation.

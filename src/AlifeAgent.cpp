@@ -7,6 +7,9 @@ AlifeAgent::AlifeAgent(IZone* owningZone, Stats initialStats) : zone(owningZone)
     agentID = nextID;
     nextID++;
     maxHP = stats.Health;
+
+    SetAlive(true);
+    SetKillable(true);
 }
 
 void AlifeAgent::Update()
@@ -48,6 +51,49 @@ void AlifeAgent::Kill()
 
     SetAlive(false);
     SetMoveable(false);
+    zone->SetMapValue(GetLocation(), -1);
+}
+
+void AlifeAgent::Move()
+{
+    double dx = GetDirection().X();
+    double dy = GetDirection().Y();
+
+    overflowX += dx;
+    overflowY += dy;
+
+    int stepX = (int)std::trunc(overflowX);
+    int stepY = (int)std::trunc(overflowY);
+
+    if (stepX != 0 || stepY != 0)
+    {
+        MoveBy(stepX, stepY);
+        overflowX -= stepX;
+        overflowY -= stepY;
+    }
+}
+
+void AlifeAgent::MoveBy(int x, int y)
+{
+    if(!IsAlive()) // if the agent is dead, it should not be able to move
+        return;
+
+    // Free up this agent's spot
+    zone->SetMapValue(GetLocation(), -1);
+
+    int desiredX = std::clamp(GetLocation().x + x, 0, zone->GetSimWidth() - 1);
+    int desiredY = std::clamp(GetLocation().y + y, 0, zone->GetSimHeight() - 1);
+
+    // If the space is not occupied, the agent can move to it
+    if(!zone->IsPositionOccupied(desiredX, GetLocation().y))
+        GetLocation().x = desiredX;
+
+    // Same for the y coordinate
+    if(!zone->IsPositionOccupied(GetLocation().x, desiredY))
+        GetLocation().y = desiredY;
+        
+    // Set this agent's spot on the map
+    zone->SetMapValue(GetLocation(), GetAgentID());
 }
 
 bool AlifeAgent::DetachFromTeam()

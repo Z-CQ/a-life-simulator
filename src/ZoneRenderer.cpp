@@ -11,6 +11,13 @@ Element ZoneRenderer::BuildWorldPane(int w, int h)
 {
     Canvas c(w * 2, h * 4);
 
+    for(EnvironmentEntity* e : env)
+    {
+        for(int w = 0; w < e->GetWidth(); w++)
+            for(int h = 0; h < e->GetHeight(); h++)
+                c.DrawText((e->GetPosition().x  + w )* 2, (e->GetPosition().y + h) * 4, std::string(1, e->GetResembledBy()), e->GetColor());
+    }
+
     for(AlifeAgent* ag : agents)
     {
         Color col = Factions::ResolveFactionColor(ag->GetAgentFaction());
@@ -23,12 +30,6 @@ Element ZoneRenderer::BuildWorldPane(int w, int h)
         }
     }
 
-    for(EnvironmentEntity* e : env)
-    {
-        for(int w = 0; w < e->GetWidth(); w++)
-            for(int h = 0; h < e->GetHeight(); h++)
-                c.DrawText((e->GetPosition().x  + w )* 2, (e->GetPosition().y + h) * 4, std::string(1, e->GetResembledBy()), e->GetColor());
-    }
 
     return canvas(std::move(c));
 }

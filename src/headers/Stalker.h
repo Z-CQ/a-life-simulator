@@ -6,10 +6,6 @@
 
 class Stalker : public AlifeAgent {
 
-private:
-    Intent currentIntent;
-    MovementState currentMovementState;
-
 public:
 
     Stalker(IZone* owningZone, Stats initialStats) : AlifeAgent(owningZone, initialStats) {}

@@ -15,6 +15,8 @@ protected:
     double angle;
     double spread;
 
+    AgentDirection walkDirection;
+
 public:
     Team() : Leader(nullptr), origin{0, 0}, angle(0.0), spread(1.0) {}
 
@@ -45,5 +47,8 @@ public:
 
     double GetSpread() const { return spread; }
     void SetSpread(double s) { spread = s; }
+
+    void SetWalkDirection(AgentDirection newDirection) { walkDirection = newDirection; }
+    AgentDirection GetWalkDirection() const { return walkDirection; }
 
 };

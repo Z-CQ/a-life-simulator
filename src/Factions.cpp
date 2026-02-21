@@ -54,4 +54,23 @@ namespace Factions {
         }
     }
 
+    std::string ResolveFactionName(Faction fac)
+    {
+        switch(fac)
+        {
+            case Faction::Freedom:
+                return "Freedom";
+            case Faction::Duty:
+                return "Duty";
+            case Faction::Bandit:
+                return "Bandit";
+            case Faction::Loner:
+                return "Loner";
+            case Faction::Mutant:
+                return "Mutant";
+            default:
+                return "";
+        }
+    }
+
 }

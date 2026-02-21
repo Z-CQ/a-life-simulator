@@ -50,6 +50,8 @@ public:
      * @return The world grid
      */
     virtual std::vector<int> GetMap() const = 0;
+    virtual inline int GetMapTile(int x, int y) const = 0;
+    virtual inline int GetMapTile(Vector2& pos) const = 0;
 
     virtual void SetMapValue(Vector2 pos, int value) = 0;
     virtual void SetMapValue(int x, int y, int value) = 0;

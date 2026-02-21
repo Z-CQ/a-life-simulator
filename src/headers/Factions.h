@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ftxui/screen/color.hpp>
+#include <string>
 
 namespace Factions {
     enum class Faction {
@@ -37,5 +38,6 @@ namespace Factions {
     Attitude GetRelation(Faction a, Faction b);
 
     ftxui::Color ResolveFactionColor(Faction fac);
+    std::string ResolveFactionName(Faction fac);
 
 }
