@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 
-#define TICK_SPEED_MS 200
+#define TICK_SPEED_MS 125
 
 int main()
 {
@@ -15,6 +15,6 @@ int main()
     while (true) {
         zone.Update();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(TICK_SPEED_MS));
     }
 }

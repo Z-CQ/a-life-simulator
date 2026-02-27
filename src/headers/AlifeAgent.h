@@ -63,7 +63,7 @@ enum Intent {
     PATROL, // Moving in the direction of the leader
     RELAX, // Non-moving, safe, lower awareness, campfire
     COMBAT, // Targeting and fighting 'target'
-    LOOTING, // Approaching last-killed 'target' and looking the corpse
+    LOOTING, // Approaching last-killed 'target' and looking through the corpse's inventory
     RUNAWAY // Running due to low health, low morale, or high bleeding, effectively abandoning the team to rejoin later if alive
 };
 

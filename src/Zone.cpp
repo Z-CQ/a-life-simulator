@@ -5,10 +5,10 @@
 Zone::Zone() : eng(std::random_device{}())
 {
     renderer = new ZoneRenderer();
-    simWidth = Dimension::Full().dimx - 74;
-    simHeight = Dimension::Full().dimy - 2;
+    simWidth = Dimension::Full().dimx - 75;
+    simHeight = Dimension::Full().dimy - 3;
 
-    Map.resize(simWidth * simHeight, -1);
+    Map.resize((simWidth + 1) * (simHeight + 1), -1);
 }
 
 double Zone::GenerateInRange(double min, double max)
@@ -92,16 +92,16 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
         int facIndex = GenerateInRange(1, Factions::FactionCount - 1);
         Factions::Faction fac = static_cast<Factions::Faction>(facIndex);
 
-        // Instantiate the team
-        Team* team = new Team();
-
         // Keep some margin from the edges
         int margin = 4;
         Vector2 teamOrigin = Vector2{GenerateInRange(margin, GetSimWidth() - margin),
             GenerateInRange(margin, GetSimHeight() - margin)};
 
         if(IsPositionOccupied(teamOrigin))
-            FindFreeSpace(teamOrigin, 8);
+            if(!FindFreeSpace(teamOrigin, 8)) continue;
+
+        // Instantiate the team
+        Team* team = new Team();
 
         team->SetOrigin(teamOrigin);
 
@@ -113,6 +113,30 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
         for(int j = 0; j < stalkersPerTeam && stalkersToMake > 0; j++)
         {
+            // Place agent around the center with small random jitter so they stay close
+            double angle = team->GetAngle() + TwoPi * (double)j / (double)stalkersPerTeam + GenerateInRange(-0.15, 0.15);
+            double radius = GenerateInRange(team->GetSpread() * 0.05, team->GetSpread() * 0.3); // keep radius relatively small
+            double offsetX = std::cos(angle) * radius;
+            double offsetY = std::sin(angle) * radius;
+
+            double spawnX = team->GetOrigin().x + offsetX;
+            double spawnY = team->GetOrigin().y + offsetY;
+
+            // Clamp inside screen bounds and make pos
+            Vector2 pos{
+                (int) std::max(0.0, std::min((double)GetSimWidth() - 1.0, spawnX)),
+                (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
+            };
+
+            if(IsPositionOccupied(pos)) {
+                // skip if it can't find a spot to spawn
+                if(!FindFreeSpace(pos, 6))
+                {
+                    stalkersToMake--;
+                    continue;
+                }
+            }
+
             std::cout << "Creating a new STALKER." << std::endl;
 
             // Create initial stats for the stalker
@@ -149,29 +173,6 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
             // Assign the stalker to its faction
             stalker->SetAgentFaction(fac);
 
-            // Place agent around the center with small random jitter so they stay close
-            double angle = team->GetAngle() + TwoPi * (double)j / (double)stalkersPerTeam + GenerateInRange(-0.15, 0.15);
-            double radius = GenerateInRange(team->GetSpread() * 0.05, team->GetSpread() * 0.3); // keep radius relatively small
-            double offsetX = std::cos(angle) * radius;
-            double offsetY = std::sin(angle) * radius;
-
-            double spawnX = team->GetOrigin().x + offsetX;
-            double spawnY = team->GetOrigin().y + offsetY;
-
-            // Clamp inside screen bounds and make pos
-            Vector2 pos{
-                (int) std::max(0.0, std::min((double)GetSimWidth() - 1.0, spawnX)),
-                (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
-            };
-
-            if(IsPositionOccupied(pos)) {
-                // skip if it can't find a spot to spawn
-                if(!FindFreeSpace(pos, 6))
-                {
-                    stalkersToMake--;
-                }
-            }
-
             stalker->GetLocation() = pos;
             SetMapValue(pos, stalker->GetAgentID());
 
@@ -190,16 +191,16 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
     {
         std::cout << "Generating a new MUTANT team." << std::endl;
 
-        // Instantiate the team
-        Team* team = new Team();
-
         // Keep some margin from the edges
         int margin = 4;
         Vector2 teamOrigin = Vector2{GenerateInRange(margin, GetSimWidth() - margin),
             GenerateInRange(margin, GetSimHeight() - margin)};
 
         if(IsPositionOccupied(teamOrigin))
-            FindFreeSpace(teamOrigin, 8);
+            if(!FindFreeSpace(teamOrigin, 8)) continue;
+
+        // Instantiate the team
+        Team* team = new Team();
 
         team->SetOrigin(teamOrigin);
 
@@ -211,6 +212,30 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
         for(int j = 0; j < mutantsPerTeam && mutantsToMake > 0; j++)
         {
+            // Place agent around the center with small random jitter so they stay close
+            double angle = team->GetAngle() + TwoPi * (double)j / (double)mutantsPerTeam + GenerateInRange(-0.15, 0.15);
+            double radius = GenerateInRange(team->GetSpread() * 0.05, team->GetSpread() * 0.3); // keep radius relatively small
+            double offsetX = std::cos(angle) * radius;
+            double offsetY = std::sin(angle) * radius;
+
+            double spawnX = team->GetOrigin().x + offsetX;
+            double spawnY = team->GetOrigin().y + offsetY;
+
+            // Clamp inside screen bounds and make pos
+            Vector2 pos{
+                (int) std::max(0.0, std::min((double)GetSimWidth() - 1.0, spawnX)),
+                (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
+            };
+
+            if(IsPositionOccupied(pos)) {
+                // skip if it can't find a spot to spawn
+                if(!FindFreeSpace(pos, 6))
+                {
+                    mutantsToMake--;
+                    continue;
+                }
+            }
+
             std::cout << "Creating a new MUTANT." << std::endl;
 
             // Create initial stats for the mutant
@@ -243,29 +268,6 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
             // Assign the mutant to its faction
             mutant->SetAgentFaction(Factions::Faction::Mutant);
 
-            // Place agent around the center with small random jitter so they stay close
-            double angle = team->GetAngle() + TwoPi * (double)j / (double)mutantsPerTeam + GenerateInRange(-0.15, 0.15);
-            double radius = GenerateInRange(team->GetSpread() * 0.05, team->GetSpread() * 0.3); // keep radius relatively small
-            double offsetX = std::cos(angle) * radius;
-            double offsetY = std::sin(angle) * radius;
-
-            double spawnX = team->GetOrigin().x + offsetX;
-            double spawnY = team->GetOrigin().y + offsetY;
-
-            // Clamp inside screen bounds and make pos
-            Vector2 pos{
-                (int) std::max(0.0, std::min((double)GetSimWidth() - 1.0, spawnX)),
-                (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
-            };
-
-            if(IsPositionOccupied(pos)) {
-                // skip if it can't find a spot to spawn
-                if(!FindFreeSpace(pos, 6))
-                {
-                    mutantsToMake--;
-                }
-            }
-
             mutant->GetLocation() = pos;
             SetMapValue(pos, mutant->GetAgentID());
 
@@ -284,8 +286,8 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
         std::cout << "Creating a campfire." << std::endl;
 
         Vector2 spawnPos{
-            GenerateInRange(0, GetSimWidth()),
-            GenerateInRange(0, GetSimHeight())
+            GenerateInRange(0, GetSimWidth() - 1),
+            GenerateInRange(0, GetSimHeight() - 1)
         };
 
         if(IsPositionOccupied(spawnPos))
@@ -296,8 +298,6 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
         AllEnvironmentEntites.push_back(campfire);
     }
-
-
 }
 
 void Zone::AddEntry(LogEntry log)

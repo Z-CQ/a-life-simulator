@@ -25,6 +25,8 @@ AlifeAgent* AlifeAgent::SearchForNearbyEnemy()
 
     for(AlifeAgent* ag : NearbyAgents)
     {
+        if(!ag->IsAlive())
+            continue;
         Factions::Faction targetFaction = ag->GetAgentFaction();
         Factions::Attitude targetAttitude = Factions::GetRelation(GetAgentFaction(), targetFaction);
 
@@ -44,7 +46,6 @@ AlifeAgent* AlifeAgent::SearchForNearbyEnemy()
     int TargetIndex = zone->GenerateInRange(0, MaxIndex);
     AlifeAgent* NewTarget = Candidates[TargetIndex];
     
-    lastTarget = GetTarget();
     SetTarget(NewTarget);
     return NewTarget;
 }

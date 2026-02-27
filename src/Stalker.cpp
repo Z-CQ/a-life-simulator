@@ -42,10 +42,11 @@ void Stalker::Update()
     switch(currentIntent)
     {
         case PATROL:
+        {
             SearchForNearbyEnemy();
             
             if(zone->GenerateInRange(0.0, 1.0) > GetMoveSpeed() * 0.2) // multiply move speed by 0.2 to artificially slow down patrol
-                return;
+                break;
                 
             if(team)
                 SetDirection(team->GetWalkDirection());
@@ -59,18 +60,32 @@ void Stalker::Update()
             }
             
             break;
+        }
+
         case COMBAT:
-            // If the target is nullptr or dead, we can switch to looting
-            if(!GetTarget() || !GetTarget()->IsAlive())
+        {
+            // If the target is dead, we can switch to looting; patrol if nullptr
+            if(GetTarget())
             {
+                if(!GetTarget()->IsAlive())
+                {
+                    currentIntent = LOOTING;
+                    targetPosition = GetTarget()->GetLocation();
+                    lastTarget = GetTarget();
+                    SetTarget(nullptr);
+                    break;
+                }
+            } else {
                 currentIntent = PATROL;
-                SetTarget(nullptr);
                 break;
             }
 
             // If this agent is tiles away from the target, it should use Strength rather than Skill
             int DistanceToTarget = Vector2::DistanceSquared(GetLocation(), GetTarget()->GetLocation());
             bool IsClose = DistanceToTarget <= 9;
+
+            if(!IsClose && GetInventory().Ammo <= 0)
+                break;
 
             double RandomChance = zone->GenerateInRange(0.0, 1.0);
             bool CanStrike = (IsClose ? RandomChance <= GetStrength() : RandomChance <= GetSkill()) &&
@@ -80,8 +95,47 @@ void Stalker::Update()
             {
                 int Damage = IsClose ? std::round(zone->GenerateInRange(12.0, 32.0) * GetStrength()) : std::round(zone->GenerateInRange(21.0, 39.0) * GetSkill());
                 GetTarget()->Hurt(Damage, this);
+                if(!IsClose)
+                    GetInventory().Ammo--;
             }
             break;
+        }
+
+        case LOOTING:
+        {
+            if((targetPosition.x < 0 && targetPosition.y < 0) || !lastTarget)
+            {
+                currentIntent = PATROL;
+                break;
+            }
+            SearchForNearbyEnemy();
+
+            int DistanceSquared = Vector2::DistanceSquared(GetLocation(), lastTarget->GetLocation());
+            if(DistanceSquared > 2)
+            {
+                Move();
+            } else {
+                std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+                std::string lootedFac = Factions::ResolveFactionName(lastTarget->GetAgentFaction());
+                zone->AddEntry(LogEntry(ownFac + " looted " + lootedFac + ".", Factions::ResolveFactionColor(GetAgentFaction()))); 
+                Inventory tInv = lastTarget->GetInventory();
+                GetInventory().Ammo += tInv.Ammo;
+                GetInventory().Food += tInv.Food;
+                GetInventory().Water += tInv.Water;
+                GetInventory().Bandages += tInv.Bandages;
+                tInv.Zero();
+                lastTarget = nullptr;
+                currentIntent = PATROL;
+                targetPosition = Vector2{-1, -1};
+            }
+
+            // If this agent locked onto something, switch to COMBAT.
+            if(GetTarget()) {
+                currentIntent = COMBAT;
+            }
+
+            break;
+        }
     }
 }
 

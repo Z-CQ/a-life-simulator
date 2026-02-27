@@ -28,10 +28,11 @@ void Mutant::Update()
     switch(currentIntent)
     {
         case PATROL:
+        {
             SearchForNearbyEnemy();
             
             if(zone->GenerateInRange(0.0, 1.0) > GetMoveSpeed() * 0.3) // multiply move speed by 0.3 to artificially slow down patrol
-                return;
+                break;
                 
             if(team)
                 SetDirection(team->GetWalkDirection());
@@ -44,15 +45,26 @@ void Mutant::Update()
             }
             
             break;
+        }
+
         case COMBAT:
-            // If the target is nullptr or dead, we can switch to looting
-            if(!GetTarget() || !GetTarget()->IsAlive())
+        {
+            // If the target is dead, we can switch to looting; patrol if nullptr
+            if(GetTarget())
             {
+                if(!GetTarget()->IsAlive())
+                {
+                    currentIntent = LOOTING;
+                    targetPosition = GetTarget()->GetLocation();
+                    lastTarget = GetTarget();
+                    SetTarget(nullptr);
+                    break;
+                }
+            } else {
                 currentIntent = PATROL;
-                SetTarget(nullptr);
-                targetPosition = Vector2{-1, -1};
                 break;
             }
+            
             targetPosition = GetTarget()->GetLocation();
             Move();
 
@@ -67,6 +79,43 @@ void Mutant::Update()
                 GetTarget()->Hurt(Damage, this);
             }
             break;
+        }
+
+        case LOOTING:
+        {
+            if((targetPosition.x < 0 && targetPosition.y < 0) || !lastTarget)
+            {
+                currentIntent = PATROL;
+                break;
+            }
+            SearchForNearbyEnemy();
+
+            int DistanceSquared = Vector2::DistanceSquared(GetLocation(), lastTarget->GetLocation());
+            if(DistanceSquared > 2)
+            {
+                Move();
+            } else {
+                std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+                std::string lootedFac = Factions::ResolveFactionName(lastTarget->GetAgentFaction());
+                zone->AddEntry(LogEntry(ownFac + " looted " + lootedFac + ".", Factions::ResolveFactionColor(GetAgentFaction()))); 
+                Inventory tInv = lastTarget->GetInventory();
+                GetInventory().Ammo += tInv.Ammo;
+                GetInventory().Food += tInv.Food;
+                GetInventory().Water += tInv.Water;
+                GetInventory().Bandages += tInv.Bandages;
+                tInv.Zero();
+                lastTarget = nullptr;
+                currentIntent = PATROL;
+                targetPosition = Vector2{-1, -1};
+            }
+
+            // If this agent locked onto something, switch to COMBAT.
+            if(GetTarget()) {
+                currentIntent = COMBAT;
+            }
+
+            break;
+        }
     }
 }
 

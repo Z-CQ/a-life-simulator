@@ -20,8 +20,8 @@ Element ZoneRenderer::BuildWorldPane(int w, int h)
 
     for(AlifeAgent* ag : agents)
     {
-        if(!ag->IsAlive() && ag->GetNearbyAgents(1).size() > 0)
-            continue;
+        // if(!ag->IsAlive() && ag->GetNearbyAgents(1).size() > 0)
+        //     continue;
             
         Color col = Factions::ResolveFactionColor(ag->GetAgentFaction());
         if(ag->IsAlive())
