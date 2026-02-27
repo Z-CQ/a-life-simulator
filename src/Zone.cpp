@@ -141,14 +141,14 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
             // Create initial stats for the stalker
             Stats stats;
-            stats.MovementSpeed += GenerateInRange(0.3, 0.5);
+            stats.MovementSpeed += GenerateInRange(-0.1, 0.3);
             stats.Strength += GenerateInRange(-0.25, 0.25);
             stats.Skill += GenerateInRange(-0.25, 0.25);
             stats.Awareness += GenerateInRange(-0.1, 0.1);
             stats.Sight += GenerateInRange(-0.15, 0.15);
             stats.Morale += GenerateInRange(-0.15, 0.15);
-            stats.Hunger += GenerateInRange(0.0, 0.1);
-            stats.Thirst += GenerateInRange(0.0, 0.15);
+            stats.Hunger += GenerateInRange(0.0, 0.05);
+            stats.Thirst += GenerateInRange(0.0, 0.1);
 
             // Create the stalker and assign as leader if there's none assigned
             Stalker* stalker = new Stalker(this, stats);
@@ -240,14 +240,15 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
             // Create initial stats for the mutant
             Stats stats;
-            stats.MovementSpeed += GenerateInRange(0.4, 0.5);
+            stats.MovementSpeed += GenerateInRange(0.3, 0.4);
             stats.Strength += GenerateInRange(0.0, 0.3);
             stats.Skill = 0;
             stats.Awareness += GenerateInRange(-0.25, 0.1);
             stats.Sight += GenerateInRange(-0.1, 0.05);
             stats.Morale += GenerateInRange(-0.05, 0.05);
-            stats.Hunger += GenerateInRange(0.0, 0.1);
-            stats.Thirst += GenerateInRange(0.0, 0.15);
+            stats.Hunger += GenerateInRange(0.0, 0.05);
+            stats.Thirst += GenerateInRange(0.0, 0.1);
+            stats.Regen = GenerateInRange(1, 3);
 
             // Create the mutant and assign as leader if there's none assigned
             Mutant* mutant = new Mutant(this, stats);

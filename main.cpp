@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <iostream>
 
-#define TICK_SPEED_MS 125
+#define TICK_SPEED_MS 100
 
 int main()
 {
     Zone zone{};
 
-    zone.Populate(35, 9, 12, 80, 4);
+    zone.Populate(48, 12, 12, 80, 8);
 
     // Simualation loop
     while (true) {

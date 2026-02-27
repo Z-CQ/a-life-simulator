@@ -141,6 +141,8 @@ public:
     }
     virtual void OnAllyAttacked([[maybe_unused]] AlifeAgent* Attacker) {}
 
+    Intent GetCurrentIntent() const { return currentIntent; }
+
     std::vector<AlifeAgent*> GetNearbyAgents(int radius);
     bool HasLineOfSight(AlifeAgent* target);
 
@@ -196,6 +198,14 @@ public:
     void SetBleeding(int b) { stats.BleedAmount = b; };
     void StopBleeding() { stats.BleedAmount = 0; }
 
+    double GetHunger() const { return stats.Hunger; }
+    void SetHunger(double h) { stats.Hunger = h; }
+    void AdjustHunger(double h) { stats.Hunger = std::clamp(stats.Hunger + h, 0.0, 1.0); }
+
+    double GetThirst() const { return stats.Thirst; }
+    void SetThirst(double t) { stats.Thirst = t; }
+    void AdjustThirst(double t) { stats.Thirst = std::clamp(stats.Thirst + t, 0.0, 1.0); }
+
     // The loot the agent has.
     Inventory& GetInventory() { return inventory; };
 
@@ -226,13 +236,13 @@ public:
     // Make this agent the leader of its team.
     void PromoteToLeader();
     
-    void Hurt(int Damage, AlifeAgent* Attacker);
+    void Hurt(int Damage, AlifeAgent* Attacker, bool CausesBleeding = true);
     void Heal(int Amount);
 
     void Kill();
 
     /**
-     * Tell the agent to walk in its current direction.
+     * Tell the agent to walk in its current direction OR towards the target position.
      */
     void Move();
 
@@ -246,6 +256,20 @@ public:
      * @param y How many y steps to move by.
      */
     void MoveBy(int x, int y);
+
+    /**
+     * Tell the agent to consume food if available. If eaten, morale will increase.
+     * 
+     * @return `true` if food was eaten, `false` if not.
+     */
+    bool Eat();
+
+    /**
+     * Tell the agent to consume water if available. If drank, morale will slightly increase.
+     * 
+     * @return `true` if water was drank, `false` if not.
+     */
+    bool Drink();
 
 
     virtual ~AlifeAgent() = default;

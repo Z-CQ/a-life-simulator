@@ -35,7 +35,7 @@ protected:
     
     double GenerateInRange(double min, double max) override;
     int GenerateInRange(int min, int max) override;
-    std::vector<AlifeAgent*> GetAllAgents() const override { return AllAgents; }
+    const std::vector<AlifeAgent*>& GetAllAgents() const override { return AllAgents; }
     
     AlifeAgent* GetAgentByID(int AgentID) const override { return AllAgents[AgentID - 2]; /* Agent IDs start at 2. */ }
     
@@ -46,7 +46,7 @@ protected:
     
     inline int GetMapTile(int x, int y) const override { return y * GetSimWidth() + x; }
     inline int GetMapTile(Vector2& pos) const override { return pos.y * GetSimWidth() + pos.x; }
-    std::vector<int> GetMap() const override { return Map; }
+    const std::vector<int>& GetMap() const override { return Map; }
 
     /**
      * Creates a random amount of Stalkers and Mutants, using deviation [-Deviation, Deviation) to add or subtract to both agent counts.

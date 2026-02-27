@@ -9,6 +9,8 @@ void Mutant::Update()
     if(!IsAlive())
         return;
 
+    double HungerRate = 0.1;
+
     if(team)
     {
         if(team->GetTeamLeader() == this && zone->GenerateInRange(0.0, 1.0) <= zone->GenerateInRange(0.0, 0.2))
@@ -25,13 +27,41 @@ void Mutant::Update()
         });
     }
 
+    // 60% chance to run away if in combat & morale/health is low
+    if(currentIntent == COMBAT && GetMorale() <= 0.1 && GetHealth() < std::round((double)maxHP * 0.8) && zone->GenerateInRange(0.0, 1.0) <= 0.6)
+    {
+        currentIntent = RUNAWAY;
+        SetTarget(nullptr);
+        lastTarget = nullptr;
+        SetAgentTeam(nullptr);
+        
+        // Set a random direction and run.
+        // I would make it so they run the opposite direction consistently but i think it'd be funny if he charged at his attacker lol
+        SetDirection(AgentDirection{
+            zone->GenerateInRange(-1.0, 1.0),
+            zone->GenerateInRange(-1.0, 1.0)
+        });
+
+        std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+        zone->AddEntry(LogEntry(ownFac + " abandoned their team and is running away.", Factions::ResolveFactionColor(GetAgentFaction()))); 
+    } else if(currentIntent == RUNAWAY && (
+        (GetHealth() >= (maxHP / 4) && zone->GenerateInRange(0.0, 1.0) <= 0.4) || // If this agent is running and one of two are true - enough health and 40% chance OR 7.5% chance - return to patrol
+        (zone->GenerateInRange(0.0, 1.0) <= 0.075)
+    ))
+    {
+        currentIntent = PATROL;
+        
+        std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+        zone->AddEntry(LogEntry(ownFac + " is returning to patrol alone.", Factions::ResolveFactionColor(GetAgentFaction()))); 
+    }
+
     switch(currentIntent)
     {
         case PATROL:
         {
             SearchForNearbyEnemy();
             
-            if(zone->GenerateInRange(0.0, 1.0) > GetMoveSpeed() * 0.3) // multiply move speed by 0.3 to artificially slow down patrol
+            if(zone->GenerateInRange(0.0, 1.0) > GetMoveSpeed() * 0.7) // multiply move speed by 0.4 to artificially slow down patrol
                 break;
                 
             if(team)
@@ -64,7 +94,9 @@ void Mutant::Update()
                 currentIntent = PATROL;
                 break;
             }
-            
+
+            HungerRate += 0.1;
+
             targetPosition = GetTarget()->GetLocation();
             Move();
 
@@ -97,13 +129,10 @@ void Mutant::Update()
             } else {
                 std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
                 std::string lootedFac = Factions::ResolveFactionName(lastTarget->GetAgentFaction());
-                zone->AddEntry(LogEntry(ownFac + " looted " + lootedFac + ".", Factions::ResolveFactionColor(GetAgentFaction()))); 
-                Inventory tInv = lastTarget->GetInventory();
-                GetInventory().Ammo += tInv.Ammo;
-                GetInventory().Food += tInv.Food;
-                GetInventory().Water += tInv.Water;
-                GetInventory().Bandages += tInv.Bandages;
-                tInv.Zero();
+                zone->AddEntry(LogEntry(ownFac + " ate " + lootedFac + ".", Factions::ResolveFactionColor(GetAgentFaction()))); 
+                
+                AdjustHunger(-zone->GenerateInRange(0.1, 0.3));
+                
                 lastTarget = nullptr;
                 currentIntent = PATROL;
                 targetPosition = Vector2{-1, -1};
@@ -116,11 +145,23 @@ void Mutant::Update()
 
             break;
         }
+
+        case RUNAWAY:
+        {
+            Move();
+            break;
+        }
     }
+
+    if(zone->GenerateInRange(0.0, 1.0) <= HungerRate && zone->GenerateInRange(0.0, 1.0) <= 0.1)
+        AdjustHunger(zone->GenerateInRange(0.05, 0.2));
 }
 
 void Mutant::OnAttacked(AlifeAgent* Attacker)
 {
+    if(!Attacker)
+        return;
+
     if(!GetTarget())
     {
         SetTarget(Attacker);
@@ -138,6 +179,9 @@ void Mutant::OnAttacked(AlifeAgent* Attacker)
 
 void Mutant::OnAllyAttacked(AlifeAgent* Attacker)
 {
+    if(!Attacker)
+        return;
+
     if(!GetTarget())
     {
         bool ChanceToTarget = zone->GenerateInRange(0, 1) <= GetAwareness();

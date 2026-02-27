@@ -17,7 +17,7 @@ AlifeAgent* AlifeAgent::SearchForNearbyEnemy()
     if(GetTarget() && GetTarget()->IsAlive())
         return nullptr;
     
-    int MaxRadius = 22;
+    int MaxRadius = 32;
     std::vector<AlifeAgent*> NearbyAgents = GetNearbyAgents(std::floor(MaxRadius * GetSight()));
 
     // Track all candidates to give each an equal chance.
@@ -53,11 +53,14 @@ AlifeAgent* AlifeAgent::SearchForNearbyEnemy()
 void AlifeAgent::Update()
 {
     Heal(GetRegeneration());
+    Hurt(GetBleeding(), nullptr, false);
 }
 
 std::vector<AlifeAgent*> AlifeAgent::GetNearbyAgents(int radius)
 {
     std::vector<AlifeAgent*> NearbyAgents;
+
+    const std::vector<int> &map = zone->GetMap();
 
     for (int r = 1; r <= radius; r++) {
         for (int dy = -r; dy <= r; dy++) {
@@ -67,7 +70,7 @@ std::vector<AlifeAgent*> AlifeAgent::GetNearbyAgents(int radius)
                 int nx = GetLocation().x + dx, ny = GetLocation().y + dy;
                 if (nx < 0 || ny < 0 || nx >= zone->GetSimWidth() || ny >= zone->GetSimHeight()) continue;
 
-                int TileID = zone->GetMap()[zone->GetMapTile(nx, ny)];
+                int TileID = map[zone->GetMapTile(nx, ny)];
                 if(TileID < 2) continue; // Not an agent
 
                 NearbyAgents.push_back(zone->GetAgentByID(TileID));
@@ -117,22 +120,25 @@ void AlifeAgent::Heal(int Amount)
     SetHealth(std::clamp(GetHealth() + Amount, 0, maxHP));
 }
 
-void AlifeAgent::Hurt(int Damage, AlifeAgent* Attacker)
+void AlifeAgent::Hurt(int Damage, AlifeAgent* Attacker, bool CausesBleeding)
 {
     SetHealth(GetHealth() - Damage);
     
     if(GetHealth() <= 0)
         Kill();
     else {
-        double moraleShift = zone->GenerateInRange(-0.3, -0.1);
+        double moraleShift = zone->GenerateInRange(-0.3, 0.0);
         AdjustMorale(moraleShift);
 
-        // Can only bleed if the damage did more than 15% of the agent's max health
-        bool shouldBleed = (Damage > (maxHP / 15)) && (zone->GenerateInRange(0, 1) >= 0.35);
-        if(shouldBleed)
+        if(CausesBleeding)
         {
-            int addedBleeding = zone->GenerateInRange(1, 4);
-            SetBleeding(GetBleeding() + addedBleeding);
+            // Can only bleed if the damage did more than 15% of the agent's max health
+            bool shouldBleed = (Damage > (maxHP / 15)) && (zone->GenerateInRange(0, 1) >= 0.35);
+            if(shouldBleed)
+            {
+                int addedBleeding = zone->GenerateInRange(1, 3);
+                SetBleeding(GetBleeding() + addedBleeding);
+            }
         }
 
         OnAttacked(Attacker);
@@ -147,6 +153,9 @@ void AlifeAgent::Kill()
     SetAlive(false);
     SetMoveable(false);
     zone->SetMapValue(GetLocation(), -1);
+
+    std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+        zone->AddEntry(LogEntry(ownFac + " was lost to the Zone.", Factions::ResolveFactionColor(GetAgentFaction()))); 
 }
 
 void AlifeAgent::Move()
@@ -216,4 +225,34 @@ bool AlifeAgent::DetachFromTeam()
 void AlifeAgent::PromoteToLeader()
 {
     GetAgentTeam()->SetTeamLeader(this);
+}
+
+bool AlifeAgent::Eat()
+{
+    if(GetInventory().Food <= 0)
+        return false;
+
+    GetInventory().Food--;
+    AdjustHunger(-zone->GenerateInRange(0.1, 0.2));
+    AdjustMorale(zone->GenerateInRange(0.0, 0.2));
+
+    std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+    zone->AddEntry(LogEntry(ownFac + " ate food.", Factions::ResolveFactionColor(GetAgentFaction()))); 
+
+    return true;
+}
+
+bool AlifeAgent::Drink()
+{
+    if(GetInventory().Water <= 0)
+        return false;
+
+    GetInventory().Water--;
+    AdjustThirst(-zone->GenerateInRange(0.1, 0.2));
+    AdjustMorale(zone->GenerateInRange(0.0, 0.2));
+
+    std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+    zone->AddEntry(LogEntry(ownFac + " drank water.", Factions::ResolveFactionColor(GetAgentFaction())));
+
+    return true;
 }
