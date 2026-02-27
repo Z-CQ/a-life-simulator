@@ -38,6 +38,7 @@ namespace Factions {
     Attitude GetRelation(Faction a, Faction b);
 
     ftxui::Color ResolveFactionColor(Faction fac);
+    std::string ResolveFactionColorASCII(Faction fac);
     std::string ResolveFactionName(Faction fac);
 
 }

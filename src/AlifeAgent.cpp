@@ -12,9 +12,103 @@ AlifeAgent::AlifeAgent(IZone* owningZone, Stats initialStats) : zone(owningZone)
     SetKillable(true);
 }
 
+AlifeAgent* AlifeAgent::SearchForNearbyEnemy()
+{
+    if(GetTarget() && GetTarget()->IsAlive())
+        return nullptr;
+    
+    int MaxRadius = 22;
+    std::vector<AlifeAgent*> NearbyAgents = GetNearbyAgents(std::floor(MaxRadius * GetSight()));
+
+    // Track all candidates to give each an equal chance.
+    std::vector<AlifeAgent*> Candidates;
+
+    for(AlifeAgent* ag : NearbyAgents)
+    {
+        Factions::Faction targetFaction = ag->GetAgentFaction();
+        Factions::Attitude targetAttitude = Factions::GetRelation(GetAgentFaction(), targetFaction);
+
+        // Skip if not hostile
+        if(targetAttitude != Factions::Attitude::Hostile)
+            continue;
+
+        bool ShouldDetect = zone->GenerateInRange(0.0, 1.0) <= GetSight() && HasLineOfSight(ag);
+        if(ShouldDetect)
+            Candidates.push_back(ag);
+    }
+
+    if(Candidates.empty())
+        return nullptr;
+
+    int MaxIndex = Candidates.size() - 1;
+    int TargetIndex = zone->GenerateInRange(0, MaxIndex);
+    AlifeAgent* NewTarget = Candidates[TargetIndex];
+    
+    lastTarget = GetTarget();
+    SetTarget(NewTarget);
+    return NewTarget;
+}
+
 void AlifeAgent::Update()
 {
     Heal(GetRegeneration());
+}
+
+std::vector<AlifeAgent*> AlifeAgent::GetNearbyAgents(int radius)
+{
+    std::vector<AlifeAgent*> NearbyAgents;
+
+    for (int r = 1; r <= radius; r++) {
+        for (int dy = -r; dy <= r; dy++) {
+            for (int dx = -r; dx <= r; dx++) {
+                if (std::abs(dx) != r && std::abs(dy) != r) continue; // border only
+
+                int nx = GetLocation().x + dx, ny = GetLocation().y + dy;
+                if (nx < 0 || ny < 0 || nx >= zone->GetSimWidth() || ny >= zone->GetSimHeight()) continue;
+
+                int TileID = zone->GetMap()[zone->GetMapTile(nx, ny)];
+                if(TileID < 2) continue; // Not an agent
+
+                NearbyAgents.push_back(zone->GetAgentByID(TileID));
+            }
+        }
+    }
+
+    return NearbyAgents;
+}
+
+bool AlifeAgent::HasLineOfSight(AlifeAgent* target)
+{
+    if (!target) return false;
+
+    int x0 = GetLocation().x;
+    int y0 = GetLocation().y;
+    int x1 = target->GetLocation().x;
+    int y1 = target->GetLocation().y;
+
+    int dx = std::abs(x1 - x0);
+    int dy = std::abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    int x = x0;
+    int y = y0;
+
+    while (!(x == x1 && y == y1)) {
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x += sx; }
+        if (e2 < dx)  { err += dx; y += sy; }
+
+        if (x < 0 || y < 0 || x >= zone->GetSimWidth() || y >= zone->GetSimHeight())
+            return false;
+
+        int TileID = zone->GetMap()[zone->GetMapTile(x, y)];
+        if (TileID == 0)
+            return false;
+    }
+
+    return true;
 }
 
 void AlifeAgent::Heal(int Amount)
@@ -56,8 +150,19 @@ void AlifeAgent::Kill()
 
 void AlifeAgent::Move()
 {
-    double dx = GetDirection().X();
-    double dy = GetDirection().Y();
+    double dx = 0;
+    double dy = 0;
+    
+    if(targetPosition.x >= 0 && targetPosition.y >= 0)
+    {
+        std::pair<double, double> dir = Vector2::Direction(GetLocation(), targetPosition);
+        dx = dir.first;
+        dy = dir.second;
+    } else {
+        dx = GetDirection().X();
+        dy = GetDirection().Y();
+    }
+
 
     overflowX += dx;
     overflowY += dy;

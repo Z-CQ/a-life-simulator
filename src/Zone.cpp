@@ -164,8 +164,13 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
                 (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
             };
 
-            if(IsPositionOccupied(pos))
-                FindFreeSpace(pos, 6);
+            if(IsPositionOccupied(pos)) {
+                // skip if it can't find a spot to spawn
+                if(!FindFreeSpace(pos, 6))
+                {
+                    stalkersToMake--;
+                }
+            }
 
             stalker->GetLocation() = pos;
             SetMapValue(pos, stalker->GetAgentID());
@@ -253,8 +258,13 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
                 (int) std::max(0.0, std::min((double)GetSimHeight() - 1.0, spawnY))
             };
 
-            if(IsPositionOccupied(pos))
-                FindFreeSpace(pos, 6);
+            if(IsPositionOccupied(pos)) {
+                // skip if it can't find a spot to spawn
+                if(!FindFreeSpace(pos, 6))
+                {
+                    mutantsToMake--;
+                }
+            }
 
             mutant->GetLocation() = pos;
             SetMapValue(pos, mutant->GetAgentID());
@@ -290,7 +300,7 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
 
 }
 
-void Zone::AddEntry(std::string log)
+void Zone::AddEntry(LogEntry log)
 {
     ActivityLog.push_back(log);
 }

@@ -87,6 +87,7 @@ protected:
     MovementState currentMovementState = MOVING;
 
     Vector2 position;
+    Vector2 targetPosition{-1, -1};
     AgentDirection ownDirection;
 
     unsigned int agentID;
@@ -112,6 +113,8 @@ protected:
     // Targeted agent
     AlifeAgent* target = nullptr;
 
+    // Last targeted agent
+    AlifeAgent* lastTarget = nullptr;
 
     double overflowX;
     double overflowY;
@@ -119,6 +122,14 @@ protected:
 public:
 
     AlifeAgent(IZone* owningZone, Stats initialStats);
+
+    /**
+     * Tell the agent to search & lock on a nearby enemy. Search radius is 14 multiplied with the agent's sight.
+     * The event will cancel if there's already a living target.
+     * 
+     * @return the Agent that was targeted
+     */
+    AlifeAgent* SearchForNearbyEnemy();
 
     virtual void Update() = 0;
     virtual void OnAttacked([[maybe_unused]] AlifeAgent* Attacker) {
@@ -129,6 +140,9 @@ public:
         }
     }
     virtual void OnAllyAttacked([[maybe_unused]] AlifeAgent* Attacker) {}
+
+    std::vector<AlifeAgent*> GetNearbyAgents(int radius);
+    bool HasLineOfSight(AlifeAgent* target);
 
     Vector2& GetLocation() { return position; }
 
@@ -190,7 +204,14 @@ public:
 
     // Who is this agent attacking?
     AlifeAgent* GetTarget() const { return target; }
-    void SetTarget(AlifeAgent* t) { target = t; }
+    void SetTarget(AlifeAgent* t) {
+        target = t;
+        if(!target)
+            return;
+        std::string ownFac = Factions::ResolveFactionName(GetAgentFaction());
+        std::string enemyFac = Factions::ResolveFactionName(GetTarget()->GetAgentFaction());
+        zone->AddEntry(LogEntry(ownFac + " engaged " + enemyFac + ".", Factions::ResolveFactionColor(GetAgentFaction()))); 
+    }
 
     AgentDirection GetDirection() const { return ownDirection; }
     void SetDirection(AgentDirection dir) { ownDirection = dir; }

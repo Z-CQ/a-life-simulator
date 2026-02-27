@@ -50,7 +50,7 @@ namespace Factions {
             case Faction::Mutant:
                 return ftxui::Color::RosyBrown;
             default:
-                return ftxui::Color::GrayLight;
+                return ftxui::Color::White;
         }
     }
 
@@ -59,15 +59,15 @@ namespace Factions {
         switch(fac)
         {
             case Faction::Freedom:
-                return "Freedom";
+                return "[FREEDOM]";
             case Faction::Duty:
-                return "Duty";
+                return "[DUTY]";
             case Faction::Bandit:
-                return "Bandit";
+                return "[BANDIT]";
             case Faction::Loner:
-                return "Loner";
+                return "[LONER]";
             case Faction::Mutant:
-                return "Mutant";
+                return "[MUTANT]";
             default:
                 return "";
         }

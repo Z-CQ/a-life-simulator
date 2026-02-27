@@ -20,6 +20,9 @@ Element ZoneRenderer::BuildWorldPane(int w, int h)
 
     for(AlifeAgent* ag : agents)
     {
+        if(!ag->IsAlive() && ag->GetNearbyAgents(1).size() > 0)
+            continue;
+            
         Color col = Factions::ResolveFactionColor(ag->GetAgentFaction());
         if(ag->IsAlive())
         {
@@ -42,7 +45,7 @@ Element ZoneRenderer::BuildLogPane(int maxLines)
     lines.reserve(std::min((int)log.size(), maxLines));
 
     for (int i = start; i < (int)log.size(); ++i) {
-        lines.push_back(text(log[i]));
+        lines.push_back(text(log[i].log) | color(log[i].color));
     }
 
     return vbox({

@@ -2,6 +2,7 @@
 
 #include "AlifeAgent.h"
 #include "EnvironmentEntity.h"
+#include "../util/Structures.h"
 
 #include <vector>
 #include <string>
@@ -15,7 +16,7 @@ using namespace ftxui;
 class ZoneRenderer {
 
 private:
-    std::vector<std::string> log;
+    std::vector<LogEntry> log;
     std::vector<AlifeAgent*> agents;
     std::vector<EnvironmentEntity*> env;
 
@@ -41,7 +42,7 @@ private:
 public:
     void ClearDisplay();
 
-    void SetActivityLog(std::vector<std::string> &l) { log = l; }
+    void SetActivityLog(std::vector<LogEntry> &l) { log = l; }
     void SetAgents(std::vector<AlifeAgent*> &ag) { agents = ag; }
     void SetEnvironmentEntities(std::vector<EnvironmentEntity*> &ev) { env = ev; }
 

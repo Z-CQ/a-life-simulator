@@ -34,7 +34,7 @@ public:
      * 
      * @param log The log itself.
      */
-    virtual void AddEntry(std::string log) = 0;
+    virtual void AddEntry(LogEntry log) = 0;
 
     /**
      * @return The width of the simulation

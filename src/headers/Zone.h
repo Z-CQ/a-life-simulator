@@ -21,7 +21,7 @@ protected:
 
     std::vector<EnvironmentEntity*> AllEnvironmentEntites;
 
-    std::vector<std::string> ActivityLog;
+    std::vector<LogEntry> ActivityLog;
 
     int simWidth;
     int simHeight;
@@ -39,7 +39,7 @@ protected:
     
     AlifeAgent* GetAgentByID(int AgentID) const override { return AllAgents[AgentID - 2]; /* Agent IDs start at 2. */ }
     
-    void AddEntry(std::string log) override;
+    void AddEntry(LogEntry log) override;
     
     int GetSimWidth() const override { return simWidth; }
     int GetSimHeight() const override { return simHeight; }
