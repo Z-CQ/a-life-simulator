@@ -9,6 +9,7 @@ int main()
 {
     Zone zone{};
 
+    // Stalker, Mutant, Campfire, Building, Deviation
     zone.Populate(48, 12, 12, 80, 8);
 
     // Simualation loop
