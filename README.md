@@ -28,7 +28,7 @@ A makefile is also present; if you have `ftxui` installed, you can run `make`.
 
 The simulation will run with zero human input.
 
-To see arguments, run the program with `--help`. You'll be able to adjust **agent counts**, **environment spawn counts**, **simulation tick speed**, and **team sizes**.
+To see arguments, run the program with `--help`. You'll be able to adjust **agent counts**, **environment spawn counts**, **simulation tick speed**, **team sizes**, and **simulation seed**.
 
 The faction selection has been kept low for simplicity. To add more, see `/src/headers/Factions.h` and `/src/Factions.cpp`.
 

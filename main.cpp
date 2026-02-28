@@ -22,8 +22,6 @@ int stringToInt(std::string s)
 
 int main(int argc, char** argv)
 {
-    Zone zone{};
-
     int StalkerCount = 48;
     int MutantCount = 12;
     int CampfireCount = 12;
@@ -33,6 +31,7 @@ int main(int argc, char** argv)
     int MutantTeamSize = 3;
 
     int TICK_SPEED_MS = 100;
+    int SEED = -1;
 
     for(int i = 1; i < argc; ++i)
     {
@@ -52,6 +51,7 @@ int main(int argc, char** argv)
                 "  --stalker-team-size  Set the desired team size for stalkers"
                 "  --mutant-team-size   Set the desired team size for mutants"
                 "  --tick-speed         Set the tick speed in milliseconds (default: 100)\n"
+                "  --seed               Set the simulation seed, allowing for simulations to be rerun"
                 "\nNaturally, deviation should be the lowest value in the list of arguments to avoid unwanted behavior.\n"
                 "\nExample:\n"
                 "  " << argv[0] << " --stalkers 32 --mutants 12 --deviation 4\n\n";
@@ -80,11 +80,16 @@ int main(int argc, char** argv)
         } else if(arg == "--tick-speed")
         {
             TICK_SPEED_MS = stringToInt(argv[++i]);
+        } else if(arg == "--seed")
+        {
+            SEED = stringToInt(argv[++i]);
         } else {
             std::cerr << "Unknown argument: " << argv[i] << ". Terminating." << std::endl;
             exit(-1);
         }
     }
+
+    Zone zone = SEED == -1 ? Zone{} : Zone{SEED};
 
     zone.Populate(StalkerCount, MutantCount, CampfireCount, BuildingCount, GlobalDeviation, StalkerTeamSize, MutantTeamSize);
 

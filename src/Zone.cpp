@@ -2,7 +2,12 @@
 
 #include <iostream>
 
-Zone::Zone() : eng(std::random_device{}())
+Zone::Zone() : Zone(std::random_device{}())
+{
+    
+}
+
+Zone::Zone(uint64_t seed) : eng(seed)
 {
     renderer = new ZoneRenderer();
     simWidth = Dimension::Full().dimx - 75;

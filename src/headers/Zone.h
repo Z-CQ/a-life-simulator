@@ -32,6 +32,7 @@ protected:
     public:
     // Seed the engine with a random device and create a renderer on instantiation.
     Zone();
+    explicit Zone(uint64_t seed);
     
     double GenerateInRange(double min, double max) override;
     int GenerateInRange(int min, int max) override;
