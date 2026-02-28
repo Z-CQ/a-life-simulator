@@ -4,8 +4,6 @@
 #include <iostream>
 #include <string>
 
-inline constexpr int TICK_SPEED_MS = 100;
-
 int stringToInt(std::string s)
 {
     try
@@ -31,6 +29,10 @@ int main(int argc, char** argv)
     int CampfireCount = 12;
     int BuildingCount = 70;
     int GlobalDeviation = 8;
+    int StalkerTeamSize = 4;
+    int MutantTeamSize = 3;
+
+    int TICK_SPEED_MS = 100;
 
     for(int i = 1; i < argc; ++i)
     {
@@ -41,12 +43,15 @@ int main(int argc, char** argv)
             std::cout <<
                 "\nUsage: " << argv[0] << " [options]\n\n"
                 "Options:\n"
-                "  --help --h       Show this message and end program\n"
-                "  --stalkers       Set the desired amount of stalkers (default: 48)\n"
-                "  --mutants        Set the desired amount of mutants (default: 12)\n"
-                "  --campfires      Set the desired amount of campfires (default: 12)\n"
-                "  --buildings      Set the desired amount of buildings (default: 70)\n"
-                "  --deviation      Set the random deviation (neg and pos) to each value (default: 8)\n"
+                "  --help --h           Show this message and end program\n"
+                "  --stalkers           Set the desired amount of stalkers (default: 48)\n"
+                "  --mutants            Set the desired amount of mutants (default: 12)\n"
+                "  --campfires          Set the desired amount of campfires (default: 12)\n"
+                "  --buildings          Set the desired amount of buildings (default: 70)\n"
+                "  --deviation          Set the random deviation (neg and pos) to each value above (default: 8)\n"
+                "  --stalker-team-size  Set the desired team size for stalkers"
+                "  --mutant-team-size   Set the desired team size for mutants"
+                "  --tick-speed         Set the tick speed in milliseconds (default: 100)\n"
                 "\nNaturally, deviation should be the lowest value in the list of arguments to avoid unwanted behavior.\n"
                 "\nExample:\n"
                 "  " << argv[0] << " --stalkers 32 --mutants 12 --deviation 4\n\n";
@@ -66,13 +71,22 @@ int main(int argc, char** argv)
         } else if(arg == "--deviation")
         {
             GlobalDeviation = stringToInt(argv[++i]);
+        } else if(arg == "--stalker-team-size")
+        {
+            StalkerTeamSize = stringToInt(argv[++i]);
+        } else if(arg == "--mutant-team-size")
+        {
+            MutantTeamSize = stringToInt(argv[++i]);
+        } else if(arg == "--tick-speed")
+        {
+            TICK_SPEED_MS = stringToInt(argv[++i]);
         } else {
             std::cerr << "Unknown argument: " << argv[i] << ". Terminating." << std::endl;
             exit(-1);
         }
     }
 
-    zone.Populate(StalkerCount, MutantCount, CampfireCount, BuildingCount, GlobalDeviation);
+    zone.Populate(StalkerCount, MutantCount, CampfireCount, BuildingCount, GlobalDeviation, StalkerTeamSize, MutantTeamSize);
 
     // Simualation loop
     while (true) {

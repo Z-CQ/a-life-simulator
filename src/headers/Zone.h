@@ -57,7 +57,7 @@ protected:
      * @param Buildings The amount of buildings to generate.
      * @param Deviation The range to subtract/add to all counts.
      */
-    void Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation);
+    void Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation, int StalkerTeamSize, int MutantTeamSize);
 
     /**
      * Called every tick of the game. Updates each agent and display. Naturally, the call frequency determines the speed of the simulation.

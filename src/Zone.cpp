@@ -29,7 +29,7 @@ int Zone::GenerateInRange(int min, int max)
     return dist(eng);
 }
 
-void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation)
+void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int Deviation, int StalkerTeamSize, int MutantTeamSize)
 {
     Factions::InitFactions();
 
@@ -41,10 +41,10 @@ void Zone::Populate(int Stalkers, int Mutants, int Campfires, int Buildings, int
     int mutantsToMake = finalMutantCount;
 
     // How many stalkers at most do we want per team?
-    int stalkersPerTeam = 4;
+    int stalkersPerTeam = StalkerTeamSize;
 
     // How many mutants at most do we want per team?
-    int mutantsPerTeam = 3;
+    int mutantsPerTeam = MutantTeamSize;
 
     // Calculate how many STALKER teams we want.
     int numStalkerTeams = (finalStalkerCount + stalkersPerTeam - 1) / stalkersPerTeam;

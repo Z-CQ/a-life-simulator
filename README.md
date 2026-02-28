@@ -26,16 +26,14 @@ A makefile is also present; if you have `ftxui` installed, you can run `make`.
 `./build/main` with CMake<br>
 `./main` with Make
 
-The simulation will run with zero human input. 
+The simulation will run with zero human input.
+
+To see arguments, run the program with `--help`. You'll be able to adjust **agent counts**, **environment spawn counts**, **simulation tick speed**, and **team sizes**.
 
 The faction selection has been kept low for simplicity. To add more, see `/src/headers/Factions.h` and `/src/Factions.cpp`.
 
 Simulation width and height are determined by terminal size, with 74 characters reserved width-wise for an activity log, which populates with agent actions.
 <i>Because of this, it is recommended to keep your terminal fairly zoomed out.</i>
-
-To change spawn counts or simulation speed, see `/main.cpp`. The `TICK_SPEED_MS` integer controls the delay of each simulation tick in milliseconds.
-The Zone spawn parameters are listed in the comment above the `Zone.populate` call. Adjust these to your liking.
-Similarly, you can adjust agent counts for teams in `/src/Zone.cpp` at the top of the `Zone::Populate` function.
 
 The API is <i>fairly</i> readable & usable. All methods are documented. Feel free to use this for whatever or expand upon it.
 
