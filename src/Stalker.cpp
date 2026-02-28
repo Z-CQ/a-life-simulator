@@ -190,7 +190,7 @@ void Stalker::Update()
         AdjustHunger(zone->GenerateInRange(0.05, 0.2));
 
     if(zone->GenerateInRange(0.0, 1.0) <= ThirstRate && zone->GenerateInRange(0.0, 1.0) <= 0.2)
-        AdjustHunger(zone->GenerateInRange(0.1, 0.25));
+        AdjustThirst(zone->GenerateInRange(0.1, 0.25));
 
     if(GetHunger() > 0.8 && GetInventory().Food > 0 && zone->GenerateInRange(0.0, 1.0) <= 0.2)
         Eat();

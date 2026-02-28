@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 
-#define TICK_SPEED_MS 100
+inline constexpr int TICK_SPEED_MS = 100;
 
 int main()
 {
