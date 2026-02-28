@@ -67,14 +67,6 @@ enum Intent {
     RUNAWAY // Running due to low health, low morale, or high bleeding, effectively abandoning the team to rejoin later if alive
 };
 
-// How is this agent moving?
-enum MovementState {
-    MOVING, // Moving to intent?
-    STILL, // Not moving?
-    COVER, // Moving to cover?
-    FLEEING, // Running?
-};
-
 class AlifeAgent {
 
 private:
@@ -84,7 +76,6 @@ protected:
     IZone* zone;
     
     Intent currentIntent = PATROL;
-    MovementState currentMovementState = MOVING;
 
     Vector2 position;
     Vector2 targetPosition{-1, -1};
